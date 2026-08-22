@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: globaltrotters
+      POSTGRES_PASSWORD: globaltrotters
+      POSTGRES_DB: globaltrotters
+    ports:
+      - "5432:5432"
+    volumes:
+      - gt_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U globaltrotters"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://globaltrotters:globaltrotters@db:5432/globaltrotters"
+      JWT_SECRET: "dev-secret-change-me"
+      PORT: 4000
+    ports:
+      - "4000:4000"
+    command: sh -c "npx prisma migrate deploy && npx prisma db seed && node dist/server.js"
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  gt_db_data:

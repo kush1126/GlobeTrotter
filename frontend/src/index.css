@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Focus states */
+:focus-visible {
+  outline: 2px solid theme("colors.route.DEFAULT");
+  outline-offset: 2px;
+}
+
+/* Ticket-stub card: clean boarding pass stub styling */
+.ticket-stub {
+  position: relative;
+  background: white;
+  border: 1px solid theme("colors.paper.dim");
+}
+.ticket-stub::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 88px;
+  width: 0;
+  border-right: 1.5px dashed theme("colors.paper.dim");
+}
+.ticket-stub::before {
+  content: "";
+  position: absolute;
+  right: calc(88px - 7px);
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: theme("colors.paper.DEFAULT");
+  border: 1px solid theme("colors.paper.dim");
+  border-top: none;
+  z-index: 2;
+}
+
+/* Route line: crisp solid dashed connector */
+.route-line {
+  position: relative;
+}
+.route-line::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 10px;
+  bottom: 10px;
+  width: 0;
+  border-left: 2px dashed theme("colors.route.DEFAULT");
+}
+.route-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: theme("colors.paper.DEFAULT");
+  border: 3px solid theme("colors.route.DEFAULT");
+  flex-shrink: 0;
+}
+
+/* Clean Input Styling */
+.gt-input {
+  width: 100%;
+  background: white;
+  border: 1.5px solid theme("colors.paper.dim");
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  font-family: theme("fontFamily.body");
+  font-size: 0.875rem;
+  color: theme("colors.ink.DEFAULT");
+  transition: all 0.2s ease;
+}
+.gt-input:hover {
+  border-color: theme("colors.paper.dark");
+}
+.gt-input:focus {
+  border-color: theme("colors.route.DEFAULT");
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+  outline: none;
+}
+
+/* Custom Travel Stamp */
+.travel-stamp {
+  border: 2px dashed theme("colors.ochre.DEFAULT");
+  border-radius: 0.75rem;
+  transform: rotate(-1.5deg);
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  font-family: theme("fontFamily.mono");
+  font-weight: 700;
+  text-transform: uppercase;
+  color: theme("colors.ochre.DEFAULT");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

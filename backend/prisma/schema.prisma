@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  avatarUrl    String?
+  currency     String   @default("USD")
+  language     String   @default("English (US)")
+  createdAt    DateTime @default(now())
+
+  trips        Trip[]
+  sharedWithMe TripShare[] @relation("SharedWithUser")
+}
+
+
+model Trip {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+  coverImage  String?
+  startDate   DateTime
+  endDate     DateTime
+  isPublic    Boolean  @default(false)
+  shareToken  String   @unique @default(uuid())
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  stops       TripStop[]
+  budgets     BudgetItem[]
+  shares      TripShare[]
+
+  @@index([userId])
+}
+
+model TripStop {
+  id            String   @id @default(uuid())
+  tripId        String
+  trip          Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  city          String
+  country       String
+  arrivalDate   DateTime
+  departureDate DateTime
+  orderIndex    Int
+  plannedBudget Decimal? @db.Decimal(10, 2)
+  notes         String?
+
+  activities    Activity[]
+
+  @@index([tripId])
+}
+
+model Activity {
+  id             String   @id @default(uuid())
+  stopId         String
+  stop           TripStop @relation(fields: [stopId], references: [id], onDelete: Cascade)
+
+  name           String
+  category       String   // sightseeing, food, transport, stay, other
+  date           DateTime
+  startTime      String?  // "09:00"
+  endTime        String?
+  estimatedCost  Decimal  @db.Decimal(10, 2)
+  currency       String   @default("USD")
+  notes          String?
+
+  createdAt      DateTime @default(now())
+
+  @@index([stopId])
+}
+
+model ActivityCatalog {
+  id          String   @id @default(uuid())
+  city        String
+  country     String
+  name        String
+  category    String
+  avgCost     Decimal  @db.Decimal(10, 2)
+  currency    String   @default("USD")
+  rating      Float?
+  description String?
+  imageUrl    String?
+
+  @@index([city])
+  @@index([category])
+}
+
+model BudgetItem {
+  id             String  @id @default(uuid())
+  tripId         String
+  trip           Trip    @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  category       String  // transport, stay, activities, food, misc
+  plannedAmount  Decimal @db.Decimal(10, 2)
+
+  @@index([tripId])
+}
+
+model TripShare {
+  id               String   @id @default(uuid())
+  tripId           String
+  trip             Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  sharedWithUserId String?
+  sharedWithUser   User?    @relation("SharedWithUser", fields: [sharedWithUserId], references: [id], onDelete: Cascade)
+
+  permission       String   @default("view") // view | edit
+  createdAt        DateTime @default(now())
+
+  @@unique([tripId, sharedWithUserId])
+  @@index([tripId])
+}
